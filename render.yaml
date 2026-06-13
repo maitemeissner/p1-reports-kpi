@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: reports-kpi
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+  - type: web
+    name: mcp-reports
+    runtime: node
+    buildCommand: cd mcp-server && npm install && npm run build
+    startCommand: cd mcp-server && node dist/index.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+
+  - type: cron
+    name: etl-cron
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python etl.py
+    schedule: "0 */6 * * *"
