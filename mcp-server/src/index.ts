@@ -1,9 +1,18 @@
 import express from 'express';
+import Database from 'better-sqlite3';
+import path from 'path';
+import { execSync } from 'child_process';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const DATA_PATH = process.env.DATA_PATH || path.join(__dirname, '..', 'data');
 
 app.use(express.json());
+
+function getDb() {
+  const dbPath = path.join(DATA_PATH, 'database.sqlite');
+  return new Database(dbPath);
+}
 
 const sopDatabase: { pattern: string; suggestion: string }[] = [];
 
@@ -11,18 +20,12 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'mcp-reports' });
 });
 
-app.get('/kpis', async (_req, res) => {
+app.get('/kpis', (_req, res) => {
   try {
-    const sqlite3 = await import('sqlite3');
-    const db = new sqlite3.Database('../data/database.sqlite');
-    db.all('SELECT * FROM kpis ORDER BY date DESC LIMIT 30', (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json(rows);
-    });
+    const db = getDb();
+    const rows = db.prepare('SELECT * FROM kpis ORDER BY date DESC LIMIT 30').all();
     db.close();
+    res.json(rows);
   } catch {
     res.json({ message: 'No data yet', kpis: [] });
   }
@@ -52,10 +55,9 @@ app.post('/sop/add', (req, res) => {
   res.json({ message: 'SOP suggestion added', total: sopDatabase.length });
 });
 
-app.post('/etl', async (_req, res) => {
+app.post('/etl', (_req, res) => {
   try {
-    const { execSync } = await import('child_process');
-    execSync('python ../etl.py', { stdio: 'inherit' });
+    execSync('python etl.py', { cwd: path.join(__dirname, '..'), stdio: 'inherit' });
     res.json({ message: 'ETL triggered successfully' });
   } catch (error) {
     const err = error as Error;

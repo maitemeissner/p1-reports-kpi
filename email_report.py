@@ -9,7 +9,8 @@ from email.mime.base import MIMEBase
 from email import encoders
 from datetime import datetime, timedelta
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'database.sqlite')
+DATA_PATH = os.environ.get('DATA_PATH', os.path.join(os.path.dirname(__file__), 'data'))
+DB_PATH = os.path.join(DATA_PATH, 'database.sqlite')
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587

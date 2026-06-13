@@ -7,7 +7,8 @@ import sqlite3
 import os
 import json
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'database.sqlite')
+DATA_PATH = os.environ.get('DATA_PATH', os.path.join(os.path.dirname(__file__), 'data'))
+DB_PATH = os.path.join(DATA_PATH, 'database.sqlite')
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)

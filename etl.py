@@ -3,7 +3,8 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'database.sqlite')
+DATA_PATH = os.environ.get('DATA_PATH', os.path.join(os.path.dirname(__file__), 'data'))
+DB_PATH = os.path.join(DATA_PATH, 'database.sqlite')
 
 def calculate_kpis():
     conn = sqlite3.connect(DB_PATH)

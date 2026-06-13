@@ -7,6 +7,12 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: DATA_PATH
+        value: /data
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
 
   - type: web
     name: mcp-reports
@@ -16,6 +22,12 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20
+      - key: DATA_PATH
+        value: /data
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
 
   - type: cron
     name: etl-cron
@@ -23,3 +35,10 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python etl.py
     schedule: "0 */6 * * *"
+    envVars:
+      - key: DATA_PATH
+        value: /data
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
